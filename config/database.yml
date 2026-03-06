@@ -1,0 +1,42 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  username: <%= ENV.fetch('DB_USERNAME', 'topup_api_user') %>
+  password: <%= ENV.fetch('DB_PASSWORD', 'topup#123') %>
+  host: <%= ENV.fetch('DB_HOST', 'localhost') %>
+  port: 5432
+  migrations_paths: db/migrate
+  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+
+development:
+  primary:
+    <<: *default
+    database: topup_api_development
+    migrations_paths: db/migrate
+  queue:
+    <<: *default
+    database: topup_api_queue_development
+    migrations_paths: db/queue_migrate
+
+  
+test:
+  <<: *default
+  database: topup_api_test
+
+
+production:
+  primary: &primary_production
+    <<: *default
+    database: topup_api_production
+    username: topup_api
+    password: <%= ENV["TOPUP_API_DATABASE_PASSWORD"] %>
+  cache:
+    <<: *primary_production
+    database: topup_api_production_cache
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *primary_production
+    database: topup_api_queue_production
+    migrations_paths: db/queue_migrate
