@@ -1,6 +1,8 @@
 class Api::V1::OrdersController < ApplicationController
 
   def create
+    order = nil
+    
     ActiveRecord::Base.transaction do
 
       order = Order.create!(order_params)
@@ -8,14 +10,13 @@ class Api::V1::OrdersController < ApplicationController
       payment = Payment.create!(payment_params(order))
 
       benefit = Benefit.create!(benefit_params(order))
-
-      render json: { order_id: order.id }, status: :created
     end
+
+    render json: { order_id: order.id }, status: :created
 
   rescue => e
     render json: { errors: e.message }, status: :unprocessable_entity
   end
-
 
   private
 
